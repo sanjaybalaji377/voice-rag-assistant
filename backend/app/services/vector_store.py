@@ -1,7 +1,6 @@
 import os
 import logging
 import datetime
-import chromadb
 from typing import List, Dict
 from app.config import settings
 from app.services.embedding_service import embedding_service
@@ -18,14 +17,25 @@ class VectorStore:
     Handles indexing, distance filtering, and source metadata attribution.
     """
     def __init__(self):
-        os.makedirs(db_path, exist_ok=True)
-        # Create or load persistent ChromaDB client
-        self.client = chromadb.PersistentClient(path=db_path)
-        # Get or create collection for storing document chunks
-        self.collection = self.client.get_or_create_collection(
-            name="voice_agent_document_chunks"
-        )
-        logger.info(f"ChromaDB persistent collection initialized at: {db_path}")
+        self.client = None
+        self.collection = None
+
+    def _initialize_db(self):
+        if self.client is None:
+            import chromadb
+            os.makedirs(db_path, exist_ok=True)
+            logger.info(f"Initializing ChromaDB client at: {db_path}...")
+            try:
+                # Create or load persistent ChromaDB client
+                self.client = chromadb.PersistentClient(path=db_path)
+                # Get or create collection for storing document chunks
+                self.collection = self.client.get_or_create_collection(
+                    name="voice_agent_document_chunks"
+                )
+                logger.info(f"ChromaDB persistent collection initialized at: {db_path}")
+            except Exception as e:
+                logger.error(f"Failed to initialize ChromaDB: {str(e)}")
+                raise e
 
     def extract_metadata_via_llm(self, title: str, chunks: List[str]) -> str:
         """
@@ -86,6 +96,7 @@ class VectorStore:
             logger.warning("Received empty chunks list for indexing.")
             return
 
+        self._initialize_db()
         try:
             # 1. Compute embeddings using the cached embedding service
             embeddings = embedding_service.get_embeddings(chunks)
@@ -157,6 +168,7 @@ class VectorStore:
             logger.warning("Empty document content received.")
             return
 
+        self._initialize_db()
         chunks = document_processor.split_text(content, chunk_size=800, chunk_overlap=150)
         self.add_document_chunks(doc_id, title, chunks)
 
@@ -167,6 +179,8 @@ class VectorStore:
         """
         if not query or not query.strip():
             return []
+
+        self._initialize_db()
 
         try:
             # 1. Generate query embedding vector

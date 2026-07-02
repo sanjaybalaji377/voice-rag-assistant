@@ -2,7 +2,6 @@ import os
 import logging
 from typing import List
 from functools import lru_cache
-from sentence_transformers import SentenceTransformer
 from app.config import settings
 
 logger = logging.getLogger(__name__)
@@ -13,21 +12,27 @@ class EmbeddingService:
     Caches computed embedding vectors for efficiency.
     """
     def __init__(self):
-        model_name = settings.EMBEDDING_MODEL
-        logger.info(f"Loading embedding model: {model_name}...")
-        try:
-            self.model = SentenceTransformer(model_name)
-            logger.info("Embedding model loaded successfully.")
-        except Exception as e:
-            logger.error(f"Failed to load embedding model {model_name}: {str(e)}")
-            raise e
+        self.model = None
+
+    def get_model(self):
+        if self.model is None:
+            from sentence_transformers import SentenceTransformer
+            model_name = settings.EMBEDDING_MODEL
+            logger.info(f"Loading embedding model: {model_name}...")
+            try:
+                self.model = SentenceTransformer(model_name)
+                logger.info("Embedding model loaded successfully.")
+            except Exception as e:
+                logger.error(f"Failed to load embedding model {model_name}: {str(e)}")
+                raise e
+        return self.model
 
     @lru_cache(maxsize=1000)
     def _cached_encode(self, text: str) -> tuple:
         """
         Internal cached encoder method returning a tuple (hashable representation of the list).
         """
-        return tuple(self.model.encode(text).tolist())
+        return tuple(self.get_model().encode(text).tolist())
 
     def get_embedding(self, text: str) -> List[float]:
         """
