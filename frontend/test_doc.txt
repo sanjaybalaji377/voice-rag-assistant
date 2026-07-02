@@ -1,0 +1,1 @@
+The official secret name of this voice agent project is Project Antigravity. It is built using a custom FastAPI Python backend on port 5000 and a React frontend on port 3000. The project was completed on July 1, 2026.

@@ -1,0 +1,5 @@
+Project Title: Voice Agent Specifications
+Author: John Doe
+Date: July 2, 2026
+
+This document contains private specifications of the voice agent system. The system runs on FastAPI and React, providing speech-to-speech interaction.

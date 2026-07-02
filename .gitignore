@@ -1,0 +1,15 @@
+# Frontend local dependencies and build outputs
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# Backend runtime, cache, and DB paths
+backend/.env
+__pycache__/
+*.pyc
+backend/chroma_db/
+
+# Bootstrap node environment and other workspace caches
+node/
+.agents/
+git/
