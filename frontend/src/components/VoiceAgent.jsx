@@ -522,19 +522,6 @@ export default function VoiceAgent() {
         {/* Documents Panel */}
         <div className="sidebar-section doc-section">
           <span className="section-label">Documents</span>
-          <div className="upload-btn-wrapper">
-            <label className="upload-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
-              </svg>
-              Upload Document
-              <input 
-                type="file" 
-                accept=".txt,.md,.csv,.json,.xml,.js,.html,.pdf,application/pdf" 
-                onChange={handleDocumentUpload} 
-              />
-            </label>
-          </div>
           <div className="items-list">
             {documents.length === 0 ? (
               <span style={{ fontSize: '0.775rem', color: 'var(--sidebar-text-muted)', paddingLeft: '0.5rem', fontStyle: 'italic' }}>
